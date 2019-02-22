@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="">
+    <style>
+        body {
+            margin: 0;
+            background: rgb(39, 35, 35);
+        }
+
+        #retter {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+
+        }
+
+        .billede {
+            margin: 10px;
+            align-items: center;
+            width: 90%;
+        }
+
+        footer {
+            background-color: black;
+            color: whitesmoke;
+            padding: 1px;
+            margin: 3px;
+        }
+
+        .pop {
+            box-sizing: border-box;
+            background-color: black;
+            width: 40vw;
+            height: 82vh;
+            margin: auto;
+            border: white solid 4px;
+            border-radius: 25px;
+        }
+
+        .pop h2 {
+            font-size: 2rem;
+            border: none;
+            background-color: black;
+
+        }
+
+        .pop p {
+            color: whitesmoke;
+            font-size: 1.3rem;
+        }
+
+        .vis {
+            background-color: whitesmoke;
+            width: 80%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            margin: 10px;
+            padding: 5px;
+        }
+
+        .vis:hover {
+            opacity: 0.7;
+        }
+
+        .vis p {
+            font-size: 1.2rem;
+            font-family: sans-serif;
+        }
+
+        .stortbillede {
+            width: 202%;
+        }
+
+        .menu {
+            text-align: center;
+        }
+
+        .valgt {
+            background-color: black;
+            color: white;
+            border-radius: 5px;
+
+        }
+
+        p.pris {
+            font-size: 2rem;
+            text-align: center;
+            font-family: sans-serif;
+
+        }
+
+
+        #popup {
+            width: 100vw;
+            height: 100vh;
+            top: 8vh;
+            position: fixed;
+            background-color: ;
+            display: none;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .pop h2 {
+            font-family: sans-serif;
+            font-size: 3rem;
+        }
+
+        .pop p {
+            font-family: sans-serif;
+            font-size: 1.2rem;
+        }
+
+        #indhold {
+            box-sizing: border-box;
+            width: 90vw;
+            height: 75vh;
+            margin: auto;
+        }
+
+        #luk {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            left: 66vw;
+            top: 1vh;
+            /*
+            box-sizing: border-box;
+            text-align: right;
+            padding-right: 1em;
+*/
+        }
+
+        #luk button {
+            color: black;
+            border: white solid;
+            font-size: 2em;
+            cursor: pointer;
+            background-color: whitesmoke;
+            border-radius: 50px;
+            width: 3.3vw;
+            margin-right: 25vw;
+        }
+
+        button.filter {
+            font-size: 2rem;
+            margin: 10px;
+        }
+
+        .headerbillede {
+
+            height: 25vw;
+        }
+
+        h1 {
+            padding-left: 15px;
+            border-radius: 5px;
+            color: whitesmoke;
+            font-size: 4rem;
+            font-family: sans-serif;
+            font-weight: 100;
+            text-align: center;
+
+        }
+
+        h2 {
+            background-color: rgba(169, 169, 169, 0.72);
+            color: whitesmoke;
+            height: 4vw;
+            padding: 5.5px;
+
+        }
+
+        h4 {
+            background-color: white;
+            color: black;
+            font-size: 6rem;
+            position: absolute;
+            top: 5vw;
+            left: 0vw;
+            padding: 15px;
+
+        }
+
+        .filter {
+            font-size: 1rem;
+            margin: 5px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="popup">
+        <div id="luk"><button>X</button></div>
+        <div id="indhold"></div>
+    </div>
+
+    <header>
+        <h4>The Cal Zone</h4>
+        <img class="headerbillede" src="other/splash.png">
+
+        <nav class="menu">
+            <button class="filter valgt" data-retter="alle">Alle</button>
+            <button class="filter" data-retter="forretter">Forretter</button>
+            <button class="filter" data-retter="hovedretter">Hovedretter</button>
+            <button class="filter" data-retter="desserter">Desserter</button>
+        </nav>
+        <h1></h1>
+    </header>
+
+    <main>
+        <section id="retter">
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <script>
+        let personer = [];
+        let filter = "alle";
+
+        document.addEventListener("DOMContentLoaded", start);
+
+        function start() {
+            let dest = document.querySelector("#retter");
+            let temp = document.querySelector("template");
+
+            async function getJson() {
+                let jsonData = await fetch("https://mandalskeawebspace.dk/claude_php/clean_up_spreadsheet.php?id=1InYSL7fmxh9FA3Cya1z8639ac5_ZWRgFwWUMumVWopM");
+                personer = await jsonData.json();
+                personer.sort((a, b) => {
+                    return a.id - b.id
+                })
+                visRetter();
+
+            }
+
+
+            function visRetter() {
+                dest.innerHTML = "";
+                personer.forEach(eachRet => {
+                    if (filter == "alle" || filter == eachRet.kategori) {
+                        let template = `<div class="vis">
+<img class="stortbillede" src = "imgs/${eachRet.billede}.png"><h2>${eachRet.navn}</h2><p>${eachRet.kort}</p><p class="pris"><br><br><br>Pris: ${eachRet.pris}</p>`;
+                        dest.insertAdjacentHTML("beforeend", template);
+                        dest.lastElementChild.addEventListener("click", åbn);
+
+                        function åbn() {
+                            document.querySelector("#indhold").innerHTML =
+                                `<div class="pop">
+<img class="billede" src = "imgs/${eachRet.billede}.jpg"><h2>${eachRet.navn}</h2><p>${eachRet.kort}</p><p class="pris"><br><br><br>Pris: ${eachRet.pris}</p>`;
+                            document.querySelector("#popup").style.display = "block";
+                        }
+                    }
+
+
+                })
+            }
+            //function visRetter slut
+
+            document.querySelector("#luk button").addEventListener("click", () => {
+                document.querySelector("#popup").style.display = "none";
+
+            })
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.addEventListener("click", filtrering);
+            })
+
+            function filtrering() {
+                filter = this.getAttribute("data-retter");
+                document.querySelector("h1").textContent = this.textContent;
+                document.querySelectorAll(".filter").forEach(elm => {
+                    elm.classList.remove("valgt");
+                })
+                this.classList.add("valgt");
+
+                visRetter();
+
+            }
+
+            getJson()
+        }
+    </script>
+
+    <footer>
+        <p>Kontakt: 00000000</p>
+        <p>Adresse: 00000000</p>
+
+    </footer>
+</body>
+
+</html>
